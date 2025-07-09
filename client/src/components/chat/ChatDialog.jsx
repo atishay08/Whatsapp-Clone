@@ -56,7 +56,7 @@ const ChatDialog = () =>{
                     <Menu/>
                 </LeftComponent>
                 <RightComponent>
-                    {/* <ChatBox/> */}
+                   
                     {Object.keys(person).length ? <ChatBox/> : <EmptyChat/>}
                 </RightComponent>
             </Component>
