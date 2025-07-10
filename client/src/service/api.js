@@ -59,5 +59,8 @@ export const getMessages=async(id)=>{
         return response.data;
     }catch(error){
         console.log(`Error while calling getMessages api : ${error.message}`);
+        
     }
 }
+
+

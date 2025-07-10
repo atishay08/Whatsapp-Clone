@@ -6,6 +6,8 @@ import { useContext,useState , useEffect} from "react";
 import {AccountContext} from '../../../context/AccountProvider';
 import { newMessage,getMessages } from "../../../service/api";
 
+
+
 const Wrapper=styled(Box)`
     background-image: url('/Screenshot.png');   
     height: 80.5vh;
@@ -19,8 +21,14 @@ const Component=styled(Box)`
     height:80.5vh;
 `
 
+const Container=styled(Box)`
+    padding:1px 80px;
+`
+
 
 const Messages = ({person,conversation})=>{
+
+
 
     const {account} = useContext(AccountContext);
     const [value,setValue]=useState('');
@@ -57,10 +65,16 @@ const Messages = ({person,conversation})=>{
     return(
         <Wrapper>
             <Component>
-                {
-                    messages && messages.map(message =>{
-                        return <Message message={message}/>
-                    })
+                {   
+                    
+                    messages && messages.map(message =>(
+                        <Container>
+                            <Message message={message}/>
+                        </Container>
+                            
+                    ))
+                
+                    
                 }
             </Component>
             <Footer
