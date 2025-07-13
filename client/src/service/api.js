@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-const url ='http://localhost:8000';
-// const url = process.env.REACT_APP_API_URL;
+const url = process.env.REACT_APP_API_URL;
 
 
 export const addUser = async(data)=>{
@@ -18,6 +17,7 @@ export const getUsers = async()=>{
         return response.data;
     }catch(error){
         console.log(`Error while calling getUsers api : ${error.message}`);
+        return [];
     }
 }
 
