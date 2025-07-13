@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const url ='http://localhost:8000';
-const url = process.env.REACT_APP_API_URL;
+const url ='http://localhost:8000';
+// const url = process.env.REACT_APP_API_URL;
 
 
 export const addUser = async(data)=>{
@@ -64,3 +64,12 @@ export const getMessages=async(id)=>{
 }
 
 
+export const uploadFile =async(data)=>{
+    try{
+        return await axios.post(`${url}/file/upload`, data);
+    }catch(error){
+        console.error(`Error while calling uploadFile api : ${error.message}`);
+        return null;
+
+    }
+}

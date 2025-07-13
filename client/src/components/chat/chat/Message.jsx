@@ -3,6 +3,10 @@ import { useContext } from 'react'
 import { Box,Typography,styled } from '@mui/material'
 import { FormatDate } from '../../../utils/common-utils'
 import { AccountContext } from '../../../context/AccountProvider'
+// import message from '../../../../../server/model/Message'
+import { GetApp } from '@mui/icons-material'
+
+import {iconPDF} from '../../../constants/data'
 
 
 
@@ -51,24 +55,65 @@ const Message = ({message}) => {
     
 
     const {account}= useContext(AccountContext);
-  return (
-    <>
-        {
-            account.sub===message.senderId?
-            <Own>
-                <Text>{message.text}</Text>
-                <Time>{FormatDate(message.createdAt)}</Time>
-            </Own>
-            :
-            <Sender>
-                <Text>{message.text}</Text>
-                <Time>{FormatDate(message.createdAt)}</Time>
-            </Sender>
-                
-        }
-    </>
+    return (
+        <>
+            {
+                account.sub===message.senderId?
+                    <Own>
+                        {
+                            message.type === 'file'? <ImageMessage message={message} /> : <TextMessage message={message}/>
+                        }
+                        
+                    </Own>
+                :
+                    <Sender>
+                        {
+                            message.type === 'file'? <ImageMessage message={message} /> : <TextMessage message={message}/>
+                        }
+                        
+                        {/* <Text>{message.text}</Text>
+                        <Time>{FormatDate(message.createdAt)}</Time> */}
+                    </Sender>
+                    
+            }
+        </>
     
-  )
+    )
 }
 
-export default Message
+const ImageMessage=({message})=>{
+    return (
+        <Box style={{position: 'relative'}}>
+            {
+                message?.text?.includes('.pdf')?
+                    <Box style={{display : 'flex'}}>
+                        <img src={iconPDF} alt='pdf' style={{width: 80}}/>
+                        <Typography style={{fontSize: 14}}>{message.text.split('/').pop()}</Typography>
+
+                    </Box> 
+                :
+                    <img style={{width: 250, height: '100%', objectFit: 'cover' }} src={message.text} alt={message.text} />   
+            }
+            <Time style={{position: 'absolute', bottom: 0, right: 0}}>
+                <GetApp
+                    style={{marginRight: 10 , border: '1px solid grey', borderRadius: '50%', fontSize: 'small'}}
+                />
+                {FormatDate(message.createdAt)}
+            </Time>
+
+        </Box>
+    )
+}
+
+const TextMessage=({message})=>{
+    return (
+        <>
+            <Text>{message.text}</Text>
+            <Time>{FormatDate(message.createdAt)}</Time>
+        </>
+        
+    )
+}
+
+
+export default Message;

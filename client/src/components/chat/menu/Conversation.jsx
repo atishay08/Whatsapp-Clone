@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { useContext,useEffect , useState} from "react";
 
 import { Box,Typography,styled } from "@mui/material";
 
 import { AccountContext } from "../../../context/AccountProvider";
-import { setConversation } from "../../../service/api";
+import { setConversation,getConversation  } from "../../../service/api";
+import { FormatDate } from "../../../utils/common-utils";
 
 const Component=styled(Box)`
     display:flex;
@@ -20,9 +21,41 @@ const Image= styled('img')({
     objectFit:'cover'
 })
 
+const Container=styled(Box)`
+    display:flex;
+`
+
+const Timestamp= styled(Typography)`
+    font-size: 12px;
+    margin-left: auto;
+    color:#00000099;
+    margin-right:20px;
+`
+
+const Text= styled(Typography)`
+    font-size: 14px;
+    
+    
+   
+`
+
+
+
 const Conversation=({user})=>{
 
-    const {setPerson,account}=useContext(AccountContext);
+    const {setPerson,account,newMessageFlag, setNewMessageFlag}=useContext(AccountContext);
+
+    const [message,setMessage] = useState({});
+
+
+    useEffect(()=>{
+        const getConversationDetails = async () =>{
+            const data = await getConversation({senderId: account.sub, receiverId: user.sub});
+            setMessage({ text:data?.message, timestamp:data?.updatedAt})
+
+        }
+        getConversationDetails();
+    },[])
 
     const getUser=async()=>{
         setPerson(user);
@@ -35,9 +68,16 @@ const Conversation=({user})=>{
             <Box>
                 <Image src={user.picture} alt="dp"/>
             </Box>
-            <Box>
-                <Box>
+            <Box style={{width : '100%'}}>
+                <Container>
                     <Typography>{user.name}</Typography>
+                    {
+                        message?.text &&
+                            <Timestamp>{FormatDate(message?.timestamp)}</Timestamp>
+                    }
+                </Container>
+                <Box>
+                    <Text>{message?.text?.includes('localhost')? 'media' : message.text}</Text>
                 </Box>
             </Box>
         </Component>

@@ -8,6 +8,7 @@ import { newMessage,getMessages } from "../../../service/api";
 
 
 
+
 const Wrapper=styled(Box)`
     background-image: url('/Screenshot.png');   
     height: 80.5vh;
@@ -30,9 +31,23 @@ const Messages = ({person,conversation})=>{
 
 
 
-    const {account} = useContext(AccountContext);
+    const {account, socket,newMessageFlag,setNewMessageFlag} = useContext(AccountContext);
     const [value,setValue]=useState('');
     const [messages,setMessages]=useState([]);
+    
+    const [image,setImage] = useState('');
+    const [incomingMessage, setIncomingMessage] = useState(null);
+
+    const [file,setFile]=useState();
+
+    useEffect(()=>{
+        socket.current.on('getMessage',data =>{
+            setIncomingMessage({
+                ...data,
+                createdAt : Date.now()
+            })
+        })
+    },[])
 
 
     useEffect(()=>{
@@ -42,23 +57,46 @@ const Messages = ({person,conversation})=>{
 
         }
         conversation._id && getMessageDetails();
-    },[person._id,conversation._id])
+        // conversation._id && getMessageDetails();
+    },[person._id,conversation._id,newMessageFlag])
 
+    useEffect(()=>{
+        incomingMessage && conversation?.members?.includes(incomingMessage.senderId) &&
+            setMessages(prev=> [...prev,incomingMessage])
+    },[incomingMessage,conversation])
 
 
     const sendText=async(e)=>{
         const code=e.keyCode || e.which;
+
         if(code===13){
-            let message={
-                senderId:account.sub,
-                receiverId:person.sub,
-                conversationId:conversation._id,
-                type:'text',
-                text:value
+            let message={};
+            if(!file){
+                message={
+                    senderId:account.sub,
+                    receiverId:person.sub,
+                    conversationId:conversation._id,
+                    type:'text',
+                    text:value
+                }
+            }else{
+                message={
+                    senderId:account.sub,
+                    receiverId:person.sub,
+                    conversationId:conversation._id,
+                    type:'file',
+                    text:image
+                }
             }
+
+            socket.current.emit('sendMessage',message);
+
             await newMessage(message);
 
             setValue('');
+            setFile('');
+            setImage('');
+            setNewMessageFlag(prev =>!prev);
         }
         
     }
@@ -80,7 +118,11 @@ const Messages = ({person,conversation})=>{
             <Footer
                 sendText={sendText}
                 setValue ={setValue}
-                value={value}/>
+                value={value}
+                file={file}
+                setFile={setFile}
+                setImage={setImage}/>
+
 
         </Wrapper>
     )
